@@ -277,6 +277,7 @@ def get_legal_move(
     board: chess.Board,
     game_state: str,
     player_one: bool,
+    temperature: float,
     max_attempts: int = 5,
 ) -> LegalMoveResponse:
     """Request a move from the player and ensure it's legal."""
@@ -285,7 +286,7 @@ def get_legal_move(
 
     for attempt in range(max_attempts):
         move_san = player.get_move(
-            board, game_state, min(((attempt / max_attempts) * 1) + 0.001, 0.5)
+            board, game_state, min(((attempt / max_attempts) * 1) + 0.001, temperature)
         )
 
         # Sometimes when GPT thinks it's the end of the game, it will just output the result
@@ -329,9 +330,9 @@ def get_legal_move(
 
 
 def play_turn(
-    player: Player, board: chess.Board, game_state: str, player_one: bool
+    player: Player, board: chess.Board, game_state: str, player_one: bool, temperature: float,
 ) -> Tuple[str, bool, bool, int]:
-    result = get_legal_move(player, board, game_state, player_one, 5)
+    result = get_legal_move(player, board, game_state, player_one, temperature, 5)
     illegal_moves = result.attempts
     move_san = result.move_san
     move_uci = result.move_uci
@@ -357,6 +358,7 @@ def play_game(
     player_two: Player,
     max_games: int = 10,
     random_opening_seed: bool = False,
+    temperature: float = .5,
 ):
     for _ in range(max_games):
         with open("gpt_inputs/prompt.txt", "r") as f:
@@ -398,7 +400,7 @@ def play_game(
                 player_one_resignation,
                 player_one_failed_to_find_legal_move,
                 illegal_moves_one,
-            ) = play_turn(player_one, board, game_state, player_one=True)
+            ) = play_turn(player_one, board, game_state, player_one=True, temperature=temperature)
             player_one_illegal_moves += illegal_moves_one
             if illegal_moves_one != 0:
                 player_one_legal_moves -= 1
@@ -414,7 +416,7 @@ def play_game(
                 player_two_resignation,
                 player_two_failed_to_find_legal_move,
                 illegal_moves_two,
-            ) = play_turn(player_two, board, game_state, player_one=False)
+            ) = play_turn(player_two, board, game_state, player_one=False, temperature=temperature)
             player_two_illegal_moves += illegal_moves_two
             if illegal_moves_two != 0:
                 player_two_legal_moves -= 1
@@ -463,23 +465,26 @@ def play_game(
 
 RUN_FOR_ANALYSIS = True
 MAX_MOVES = 89 # Due to nanogpt max input length of 1024
-recording_file = "logs/determine.csv" # default recording file. Because we are using list [player_ones], recording_file is overwritten
+recording_file_template = "logs/determine_temperature_{{temp}}.csv" # default recording file. Because we are using list [player_ones], recording_file is overwritten
 # player_one_recording_name = "ckpt_8.pt"
-player_ones = ["stockfish_16layers_ckpt_no_optimizer.pt"]
+player_ones = ["lichess_16layers_ckpt_no_optimizer.pt"]
 player_two_recording_name = "stockfish_sweep"
 if __name__ == "__main__":
-    for nanogpt_player in player_ones:
-        player_one_recording_name = nanogpt_player
-        for i in range(11):
-            num_games = 100
-            # player_one = GPTPlayer(model="gpt-3.5-turbo-instruct")
-            # player_one = LocalLlamaPlayer(model_name="meta-llama/Llama-2-7b-hf")
-            # player_one = LocalLoraLlamaPlayer("meta-llama/Llama-2-7b-hf", "/workspace/axolotl/lora2-out")
-            # player_one = GPTPlayer(model="gpt-4")
-            # player_one = StockfishPlayer(skill_level=-1, play_time=0.1)
-            player_one = NanoGptPlayer(model_name=player_one_recording_name)
-            player_two = StockfishPlayer(skill_level=i, play_time=0.1)
-            # player_two = GPTPlayer(model="gpt-4")
-            # player_two = GPTPlayer(model="gpt-3.5-turbo-instruct")
+    temp = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, .8, .9, 1.0, 1.5]
+    for t in temp:
+        recording_file = recording_file_template.replace("{{temp}}", str(t))
+        for nanogpt_player in player_ones:
+            player_one_recording_name = nanogpt_player
+            for i in range(11):
+                num_games = 100
+                # player_one = GPTPlayer(model="gpt-3.5-turbo-instruct")
+                # player_one = LocalLlamaPlayer(model_name="meta-llama/Llama-2-7b-hf")
+                # player_one = LocalLoraLlamaPlayer("meta-llama/Llama-2-7b-hf", "/workspace/axolotl/lora2-out")
+                # player_one = GPTPlayer(model="gpt-4")
+                # player_one = StockfishPlayer(skill_level=-1, play_time=0.1)
+                player_one = NanoGptPlayer(model_name=player_one_recording_name)
+                player_two = StockfishPlayer(skill_level=i, play_time=0.1)
+                # player_two = GPTPlayer(model="gpt-4")
+                # player_two = GPTPlayer(model="gpt-3.5-turbo-instruct")
 
-            play_game(player_one, player_two, num_games)
+                play_game(player_one, player_two, num_games, temperature=temp)
