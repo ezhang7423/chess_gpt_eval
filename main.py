@@ -10,7 +10,7 @@ import platform
 # NOTE: LLAMA AND NANOGPT ARE EXPERIMENTAL PLAYERS, if not using them, comment them out
 # from llama_module import BaseLlamaPlayer, LocalLlamaPlayer, LocalLoraLlamaPlayer
 from nanogpt.nanogpt_module import NanoGptPlayer
-import gpt_query
+#import gpt_query
 
 from typing import Optional, Tuple
 from dataclasses import dataclass
@@ -470,9 +470,9 @@ recording_file_template = "logs/determine_temperature_{{temp}}.csv" # default re
 player_ones = ["lichess_16layers_ckpt_no_optimizer.pt"]
 player_two_recording_name = "stockfish_sweep"
 if __name__ == "__main__":
-    temp = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, .8, .9, 1.0, 1.5]
-    for t in temp:
-        recording_file = recording_file_template.replace("{{temp}}", str(t))
+    temperature = [0.001, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, .8, .9, 1.0, 1.5]
+    for temp in temperature:
+        recording_file = recording_file_template.replace("{{temp}}", str(temp))
         for nanogpt_player in player_ones:
             player_one_recording_name = nanogpt_player
             for i in range(11):
