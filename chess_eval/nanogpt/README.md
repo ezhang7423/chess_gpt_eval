@@ -6,6 +6,9 @@ To evaluate a model, run this command:
 
 Download a model from: https://huggingface.co/adamkarvonen/chess_llms
 
+`wget https://huggingface.co/adamkarvonen/chess_llms/resolve/main/lichess_16layers_ckpt_no_optimizer.pt`
+
+
 And place it in `/nanogpt/out/`. `stockfish_16layers_ckpt_no_optimizer.pt` is the strongest model.
 Then follow the remaining setup directions in the main README.
 

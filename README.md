@@ -1,3 +1,12 @@
+## Run
+
+```
+pip install -e .
+pip install torch numpy transformers datasets tiktoken wandb tqdm
+wget https://huggingface.co/adamkarvonen/chess_llms/resolve/main/lichess_16layers_ckpt_no_optimizer.pt
+mv lichess_16layers_ckpt_no_optimizer.pt chess_eval/nanogpt/out
+python chess_eval/__init__.py
+```
 **Overview**
 
 There has recently been some buzz about the ability of GPT-3.5-turbo-instruct's chess playing ability. I wanted to take a more rigourous look and created this repo. With it, you can play two models against each other, whether that's LLM vs Stockfish, LLM vs LLM, or Stockfish vs Stockfish. The primary goal is to test and record the performance of these players against one another in various configurations. Illegal moves, resignations, and game states are all tracked and recorded for later analysis. Per move, a model gets 5 illegal moves before forced resignation of the round.

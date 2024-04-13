@@ -5,13 +5,31 @@ Sample from a trained model
 import os
 import re
 import pickle
+from pathlib import Path
 from contextlib import nullcontext
+from inspect import getsourcefile
+import inspect
 import torch
 import tiktoken
 from typing import Optional
 from chess_eval.nanogpt.model import GPTConfig, GPT # TODO import this directly from the training repo. avoid circular imports
 
-BASE_DIR = "nanogpt/"
+def abspath():
+    """
+    Returns the absolute path of the directory containing the caller module.
+
+    :return: The absolute path of the directory containing the caller module.
+    :rtype: str
+
+    # https://stackoverflow.com/questions/16771894/python-nameerror-global-name-file-is-not-defined
+    # https://docs.python.org/3/library/inspect.html#inspect.FrameInfo
+    # return os.path.dirname(inspect.stack()[1][1]) # type: ignore
+    # return os.path.dirname(getsourcefile(lambda:0)) # type: ignore
+    """
+    return Path(os.path.dirname(getsourcefile(inspect.stack()[1][0])))  # type: ignore
+
+
+BASE_DIR = abspath()
 
 
 def add_activation_bias_to_state_dict(
@@ -49,7 +67,7 @@ def add_activation_bias_to_state_dict(
 
     for activation_name in activation_names:
         activation_state_dict = torch.load(
-            f"nanogpt/activations/{activation_dir}{activation_name}",
+            f"activations/{activation_dir}{activation_name}",
             map_location=device,
         )
         difference_vector = activation_state_dict["difference_vector"]
@@ -89,9 +107,6 @@ class NanoGptPlayer:
         # device = "cpu"
         dtype = "float16"  # 'float32' or 'bfloat16' or 'float16'
         compile = False  # use PyTorch 2.0 to compile the model to be faster
-        exec(
-            open(f"{BASE_DIR}configurator.py").read()
-        )  # overrides from command line or config file
         # -----------------------------------------------------------------------------
 
         torch.manual_seed(seed)
@@ -113,8 +128,8 @@ class NanoGptPlayer:
         # model
         if init_from == "resume":
             # init from a model saved in a specific directory
-            ckpt_path = os.path.join(BASE_DIR, out_dir, self.model_name)
-            ckpt_path = f"nanogpt/out/{self.model_name}"
+            # ckpt_path = os.path.join(BASE_DIR, out_dir, self.model_name)
+            ckpt_path = abspath() / f"out/{self.model_name}"
             checkpoint = torch.load(ckpt_path, map_location=device)
             gptconf = GPTConfig(**checkpoint["model_args"])
 
