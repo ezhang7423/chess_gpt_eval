@@ -11,7 +11,7 @@ import platform
 # They are commented by default to avoid unnecessary dependencies such as pytorch.
 # from llama_module import BaseLlamaPlayer, LocalLlamaPlayer, LocalLoraLlamaPlayer
 # from nanogpt.nanogpt_module import NanoGptPlayer
-import gpt_query
+from chess_eval import gpt_query
 
 from typing import Optional, Tuple
 from dataclasses import dataclass

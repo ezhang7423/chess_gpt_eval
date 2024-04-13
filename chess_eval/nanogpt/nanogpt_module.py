@@ -9,7 +9,7 @@ from contextlib import nullcontext
 import torch
 import tiktoken
 from typing import Optional
-from nanogpt.model import GPTConfig, GPT
+from chess_eval.nanogpt.model import GPTConfig, GPT # TODO import this directly from the training repo. avoid circular imports
 
 BASE_DIR = "nanogpt/"
 
