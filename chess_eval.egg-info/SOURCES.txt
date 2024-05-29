@@ -1,0 +1,9 @@
+README.md
+setup.py
+chess_eval/__init__.py
+chess_eval/gpt_query.py
+chess_eval.egg-info/PKG-INFO
+chess_eval.egg-info/SOURCES.txt
+chess_eval.egg-info/dependency_links.txt
+chess_eval.egg-info/requires.txt
+chess_eval.egg-info/top_level.txt

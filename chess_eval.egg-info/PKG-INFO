@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: chess_eval
+Version: 1.0.0
+Summary: chess bot evaluation
+Home-page: https://github.com/ezhang7423/chess_gpt_eval.git
+Author: Adam karvonen and Eddie Zhang
+Author-email: adam.karvonen@gmail.com
+Requires-Dist: openai==0.28.0
+Requires-Dist: tiktoken==0.4.0
+Requires-Dist: tenacity==8.2.3
+Requires-Dist: python-chess==1.999
+Requires-Dist: matplotlib==3.8.0
+Requires-Dist: pandas==2.1.1
