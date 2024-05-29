@@ -17,7 +17,7 @@ from typing import Optional, Tuple
 from dataclasses import dataclass
 
 from chess_eval.nanogpt.nanogpt_module import NanoGptPlayer
-
+from eztils import wlog
 
 
 
@@ -533,3 +533,15 @@ if __name__ == "__main__":
             # player_two = GPTPlayer(model="gpt-3.5-turbo-instruct")
 
             play_game(player_one, player_two, num_games)
+
+# TODO add logging to wandb or betterstack
+def play_stockfish_with_nanogpt(nanogpt_weight_file, num_games=100, skill_level_range=None, betterstack_log=False):
+    if skill_level_range is None:
+        skill_level_range = range(11)
+    
+    for i in skill_level_range:
+        player_one = StockfishPlayer(skill_level=i, play_time=0.1)
+        player_two = NanoGptPlayer(model_name=nanogpt_weight_file)
+        play_game(player_one, player_two, num_games)
+    # player_one.close()
+    # player_two.close()
